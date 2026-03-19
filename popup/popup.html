@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Sidebar Organizer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-header">
+    <span class="popup-logo">📁</span>
+    <div class="popup-title-block">
+      <div class="popup-title">GitHub Sidebar Organizer</div>
+      <div class="popup-version">v1.0.0</div>
+    </div>
+  </div>
+
+  <div class="popup-section">
+    <div class="popup-section-title">Statistiques</div>
+    <div class="popup-stats">
+      <div class="popup-stat">
+        <span class="popup-stat-value" id="stat-repos">—</span>
+        <span class="popup-stat-label">repos épinglés</span>
+      </div>
+      <div class="popup-stat-divider"></div>
+      <div class="popup-stat">
+        <span class="popup-stat-value" id="stat-folders">—</span>
+        <span class="popup-stat-label">dossiers</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup-section">
+    <div class="popup-section-title">Paramètres</div>
+
+    <div class="popup-setting">
+      <div class="popup-setting-info">
+        <div class="popup-setting-label">Position de la sidebar</div>
+        <div class="popup-setting-desc">Gauche ou droite de l'écran</div>
+      </div>
+      <div class="popup-toggle-group" id="toggle-position">
+        <button class="toggle-option" data-value="left">Gauche</button>
+        <button class="toggle-option" data-value="right">Droite</button>
+      </div>
+    </div>
+
+    <div class="popup-setting">
+      <div class="popup-setting-info">
+        <div class="popup-setting-label">Réduite au démarrage</div>
+        <div class="popup-setting-desc">La sidebar démarre fermée</div>
+      </div>
+      <label class="popup-switch">
+        <input type="checkbox" id="pref-start-collapsed">
+        <span class="popup-switch-slider"></span>
+      </label>
+    </div>
+
+    <div class="popup-setting">
+      <div class="popup-setting-info">
+        <div class="popup-setting-label">Filtrer par orga</div>
+        <div class="popup-setting-desc">Afficher uniquement les repos de l'orga courante</div>
+      </div>
+      <label class="popup-switch">
+        <input type="checkbox" id="pref-filter-org">
+        <span class="popup-switch-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="popup-section">
+    <div class="popup-section-title">Données</div>
+    <div class="popup-actions">
+      <button class="popup-btn popup-btn-secondary" id="btn-export">📤 Exporter</button>
+      <button class="popup-btn popup-btn-secondary" id="btn-import">📥 Importer</button>
+    </div>
+    <input type="file" id="import-file" accept=".json" style="display:none">
+    <button class="popup-btn popup-btn-danger" id="btn-clear">🗑️ Tout effacer</button>
+  </div>
+
+  <div id="popup-toast" class="popup-toast"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
