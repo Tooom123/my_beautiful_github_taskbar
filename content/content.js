@@ -226,6 +226,94 @@
     });
   }
 
+  function showManualAddModal() {
+    const existing = document.getElementById("gso-modal");
+    if (existing) existing.remove();
+
+    const modal = document.createElement("div");
+    modal.id = "gso-modal";
+    modal.setAttribute("role", "dialog");
+
+    const overlay = document.createElement("div");
+    overlay.className = "gso-modal-overlay";
+    overlay.addEventListener("click", () => modal.remove());
+
+    const box = document.createElement("div");
+    box.className = "gso-modal-box";
+
+    const title = document.createElement("div");
+    title.className = "gso-modal-title";
+    title.textContent = "Ajouter un repo";
+    box.appendChild(title);
+
+    const repoInputWrap = document.createElement("div");
+    repoInputWrap.className = "gso-manual-input-wrap";
+
+    const prefix = document.createElement("span");
+    prefix.className = "gso-manual-prefix";
+    prefix.textContent = "github.com/";
+
+    const repoInput = document.createElement("input");
+    repoInput.className = "gso-modal-input";
+    repoInput.placeholder = "owner/repo";
+    repoInput.type = "text";
+    repoInput.style.flex = "1";
+
+    repoInputWrap.append(prefix, repoInput);
+    box.appendChild(repoInputWrap);
+
+    const folderLabel = document.createElement("div");
+    folderLabel.className = "gso-manual-label";
+    folderLabel.textContent = "Dans le dossier :";
+    box.appendChild(folderLabel);
+
+    const folderSelect = document.createElement("select");
+    folderSelect.className = "gso-manual-select";
+    folders.forEach(f => {
+      const opt = document.createElement("option");
+      opt.value = f.id;
+      opt.textContent = f.name;
+      folderSelect.appendChild(opt);
+    });
+    box.appendChild(folderSelect);
+
+    const confirmBtn = document.createElement("button");
+    confirmBtn.className = "gso-modal-create-btn";
+    confirmBtn.style.width = "100%";
+    confirmBtn.style.marginTop = "10px";
+    confirmBtn.textContent = "Ajouter";
+    confirmBtn.addEventListener("click", () => {
+      const raw = repoInput.value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, "");
+      const match = raw.match(/^([^/]+\/[^/]+)/);
+      if (!match) {
+        repoInput.style.borderColor = "var(--color-danger-fg, #cf222e)";
+        repoInput.focus();
+        return;
+      }
+      const repoId = match[1];
+      const folder = findFolder(folderSelect.value) || folders[0];
+      if (!folder) { modal.remove(); return; }
+      if (!folder.repos.some(r => r.id === repoId)) {
+        folder.repos.push({ id: repoId, name: repoId, url: "https://github.com/" + repoId, addedAt: Date.now() });
+      }
+      saveData();
+      rerenderAll();
+      modal.remove();
+    });
+    box.appendChild(confirmBtn);
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "gso-modal-cancel";
+    cancelBtn.style.marginTop = "6px";
+    cancelBtn.textContent = "Annuler";
+    cancelBtn.addEventListener("click", () => modal.remove());
+    box.appendChild(cancelBtn);
+
+    modal.append(overlay, box);
+    document.body.appendChild(modal);
+    repoInput.focus();
+  }
+
   function showAddModal(repo) {
     const existing = document.getElementById("gso-modal");
     if (existing) existing.remove();
@@ -589,7 +677,7 @@
     addBtn.addEventListener("click", () => {
       const repo = getCurrentRepo();
       if (!repo) {
-        alert("Aucun repo détecté sur cette page.");
+        showManualAddModal();
         return;
       }
       showAddModal(repo);
