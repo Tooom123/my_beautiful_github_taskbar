@@ -1,96 +1,56 @@
 #gso-sidebar {
-  position: fixed;
-  right: 0;
-  top: 0;
-  height: 100vh;
-  width: 260px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  background: var(--color-canvas-default, #ffffff);
-  border-left: 1px solid var(--color-border-default, #d0d7de);
-  box-shadow: -2px 0 8px rgba(0,0,0,0.08);
-  transition: width 300ms ease, right 300ms ease, left 300ms ease;
-  overflow: hidden;
+  display: block;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-muted, #d8dee4);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-fg-default, #1f2328);
 }
 
-#gso-sidebar.gso-position-left {
-  right: auto;
-  left: 0;
-  border-left: none;
-  border-right: 1px solid var(--color-border-default, #d0d7de);
-  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-}
-
-#gso-sidebar.gso-sidebar-collapsed {
-  width: 40px;
-}
-
-#gso-sidebar.gso-sidebar-collapsed .gso-header-inner,
 #gso-sidebar.gso-sidebar-collapsed .gso-body,
 #gso-sidebar.gso-sidebar-collapsed .gso-footer {
-  opacity: 0;
-  pointer-events: none;
-}
-
-#gso-toggle-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: -14px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--color-canvas-default, #ffffff);
-  border: 1px solid var(--color-border-default, #d0d7de);
-  cursor: pointer;
-  z-index: 10001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: var(--color-fg-muted, #656d76);
-  padding: 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-  transition: background 150ms ease, color 150ms ease;
-  line-height: 1;
-}
-
-#gso-toggle-btn:hover {
-  background: var(--color-canvas-subtle, #f6f8fa);
-  color: var(--color-fg-default, #1f2328);
-}
-
-#gso-sidebar.gso-position-left #gso-toggle-btn {
-  left: auto;
-  right: -14px;
+  display: none;
 }
 
 .gso-header {
-  flex-shrink: 0;
-  padding: 10px 8px 8px;
-  border-bottom: 1px solid var(--color-border-muted, #d8dee4);
-}
-
-.gso-header-inner {
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: opacity 200ms ease;
+  justify-content: space-between;
+  padding: 4px 0 6px 0;
+  margin-bottom: 2px;
 }
 
-.gso-logo {
-  font-size: 15px;
+.gso-header-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gso-collapse-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-fg-muted, #656d76);
+  font-size: 10px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
   flex-shrink: 0;
+  transition: color 100ms ease;
+  line-height: 1;
+}
+
+.gso-collapse-btn:hover {
+  color: var(--color-fg-default, #1f2328);
 }
 
 .gso-title {
-  flex: 1;
+  font-size: 12px;
   font-weight: 600;
-  font-size: 13px;
   color: var(--color-fg-default, #1f2328);
   white-space: nowrap;
   overflow: hidden;
@@ -99,62 +59,45 @@
 
 .gso-btn-add {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 6px;
-  background: var(--color-accent-fg, #0969da);
-  color: #ffffff;
-  border: none;
+  background: transparent;
+  color: var(--color-accent-fg, #0969da);
+  border: 1px solid var(--color-accent-fg, #0969da);
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  transition: opacity 150ms ease;
+  transition: background 150ms ease, color 150ms ease;
 }
 
 .gso-btn-add:hover {
-  opacity: 0.85;
+  background: var(--color-accent-fg, #0969da);
+  color: #ffffff;
 }
 
 .gso-body {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 4px 0;
-  transition: opacity 200ms ease;
-}
-
-.gso-body::-webkit-scrollbar {
-  width: 4px;
-}
-
-.gso-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.gso-body::-webkit-scrollbar-thumb {
-  background: var(--color-border-muted, #d8dee4);
-  border-radius: 2px;
+  padding: 0;
 }
 
 .gso-folder {
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 .gso-folder-header {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 5px 8px;
+  padding: 4px 6px;
   cursor: pointer;
   border-radius: 6px;
-  margin: 0 4px;
   user-select: none;
   transition: background 100ms ease;
-  min-height: 30px;
+  min-height: 28px;
 }
 
 .gso-folder-header:hover {
@@ -167,7 +110,7 @@
   transition: transform 200ms ease;
   flex-shrink: 0;
   display: inline-block;
-  width: 12px;
+  width: 10px;
   text-align: center;
 }
 
@@ -177,7 +120,7 @@
 
 .gso-folder-name {
   flex: 1;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 12px;
   color: var(--color-fg-default, #1f2328);
   white-space: nowrap;
@@ -191,11 +134,11 @@
   background: var(--color-neutral-muted, rgba(175,184,193,0.2));
   color: var(--color-fg-muted, #656d76);
   border-radius: 10px;
-  padding: 0 6px;
+  padding: 0 5px;
   font-size: 10px;
   font-weight: 500;
   line-height: 18px;
-  min-width: 18px;
+  min-width: 16px;
   text-align: center;
 }
 
@@ -215,7 +158,7 @@
 }
 
 .gso-repo-list {
-  padding: 2px 0 2px 20px;
+  padding: 1px 0 1px 16px;
   transition: background 150ms ease;
 }
 
@@ -232,10 +175,10 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  height: 32px;
-  padding: 0 6px 0 4px;
+  height: 28px;
+  padding: 0 4px;
   border-radius: 6px;
-  margin: 1px 4px 1px 0;
+  margin: 1px 0;
   cursor: default;
   transition: background 100ms ease;
   position: relative;
@@ -259,13 +202,13 @@
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(16px); }
+  from { opacity: 0; transform: translateX(10px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes fadeOut {
-  from { opacity: 1; transform: scaleY(1); max-height: 32px; }
-  to { opacity: 0; transform: scaleY(0); max-height: 0; padding: 0; margin: 0; }
+  from { opacity: 1; max-height: 28px; }
+  to { opacity: 0; max-height: 0; padding: 0; margin: 0; }
 }
 
 .gso-repo-item.gso-slide-in {
@@ -279,7 +222,7 @@
 }
 
 .gso-grip {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--color-fg-subtle, #6e7781);
   cursor: grab;
   flex-shrink: 0;
@@ -311,11 +254,12 @@
 
 .gso-repo-link:hover {
   color: var(--color-accent-fg, #0969da);
+  text-decoration: none;
 }
 
 .gso-repo-actions {
   display: flex;
-  gap: 2px;
+  gap: 1px;
   flex-shrink: 0;
   opacity: 0;
   transition: opacity 150ms ease;
@@ -333,7 +277,7 @@
   cursor: pointer;
   border-radius: 3px;
   color: var(--color-fg-muted, #656d76);
-  font-size: 11px;
+  font-size: 10px;
   padding: 0;
   display: flex;
   align-items: center;
@@ -363,33 +307,30 @@
   height: 2px;
   background: var(--color-accent-fg, #0969da);
   border-radius: 1px;
-  margin: 1px 4px;
+  margin: 1px 2px;
   pointer-events: none;
 }
 
 .gso-empty-folder {
-  padding: 4px 8px;
+  padding: 3px 6px;
   color: var(--color-fg-subtle, #6e7781);
   font-size: 11px;
   font-style: italic;
 }
 
 .gso-footer {
-  flex-shrink: 0;
-  padding: 6px 8px;
-  border-top: 1px solid var(--color-border-muted, #d8dee4);
-  transition: opacity 200ms ease;
+  padding: 6px 0 2px 0;
 }
 
 .gso-btn-new-folder {
   width: 100%;
-  padding: 5px 8px;
+  padding: 4px 6px;
   border: 1px dashed var(--color-border-default, #d0d7de);
   background: transparent;
   border-radius: 6px;
   cursor: pointer;
   color: var(--color-fg-muted, #656d76);
-  font-size: 12px;
+  font-size: 11px;
   text-align: left;
   transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
 }
@@ -413,11 +354,11 @@
 }
 
 .gso-context-menu {
-  position: absolute;
+  position: fixed;
   background: var(--color-canvas-default, #ffffff);
   border: 1px solid var(--color-border-default, #d0d7de);
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
   z-index: 10002;
   padding: 4px;
   min-width: 140px;

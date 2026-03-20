@@ -2,7 +2,7 @@
   if (document.getElementById("gso-sidebar")) return;
 
   let folders = [];
-  let preferences = { position: "right", startCollapsed: false, filterByOrg: false };
+  let preferences = { startCollapsed: false, filterByOrg: false };
   let dragState = { folderId: null, repoId: null, element: null };
   let dropIndicator = null;
   let saveTimer = null;
@@ -26,12 +26,6 @@
     };
   }
 
-  function sanitize(str) {
-    const el = document.createElement("span");
-    el.textContent = str;
-    return el.innerHTML;
-  }
-
   function debounce(fn, delay) {
     return function (...args) {
       clearTimeout(saveTimer);
@@ -43,9 +37,8 @@
     try {
       const result = await chrome.storage.local.get(["folders", "preferences"]);
       folders = result.folders || [{ id: "default", name: "Favoris", collapsed: false, repos: [] }];
-      preferences = result.preferences || { position: "right", startCollapsed: false, filterByOrg: false };
+      preferences = result.preferences || { startCollapsed: false, filterByOrg: false };
     } catch (e) {
-      console.error("[GSO] loadData error:", e);
       folders = [{ id: "default", name: "Favoris", collapsed: false, repos: [] }];
     }
   }
@@ -53,9 +46,7 @@
   const debouncedSave = debounce(async function () {
     try {
       await chrome.storage.local.set({ folders });
-    } catch (e) {
-      console.error("[GSO] save error:", e);
-    }
+    } catch (e) {}
   }, 300);
 
   function saveData() {
@@ -64,9 +55,7 @@
 
   function getRepoFolder(repoId) {
     for (const folder of folders) {
-      if (folder.repos.some(r => r.id === repoId)) {
-        return folder.id;
-      }
+      if (folder.repos.some(r => r.id === repoId)) return folder.id;
     }
     return null;
   }
@@ -92,16 +81,14 @@
     e.dataTransfer.setData("text/plain", repoId);
   }
 
-  function handleDragEnd(e) {
-    if (dragState.element) {
-      dragState.element.classList.remove("gso-dragging");
-    }
+  function handleDragEnd() {
+    if (dragState.element) dragState.element.classList.remove("gso-dragging");
     clearDropIndicators();
     document.querySelectorAll(".gso-repo-list").forEach(el => el.classList.remove("gso-drag-over"));
     dragState = { folderId: null, repoId: null, element: null };
   }
 
-  function handleDragOver(e, folderId, listEl) {
+  function handleDragOver(e, listEl) {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
     listEl.classList.add("gso-drag-over");
@@ -109,18 +96,15 @@
 
     const repoItems = listEl.querySelectorAll(".gso-repo-item:not(.gso-dragging)");
     let inserted = false;
-
     for (const item of repoItems) {
       const rect = item.getBoundingClientRect();
-      const mid = rect.top + rect.height / 2;
-      if (e.clientY < mid) {
+      if (e.clientY < rect.top + rect.height / 2) {
         dropIndicator = createDropIndicator();
         item.parentNode.insertBefore(dropIndicator, item);
         inserted = true;
         break;
       }
     }
-
     if (!inserted) {
       dropIndicator = createDropIndicator();
       listEl.appendChild(dropIndicator);
@@ -137,30 +121,20 @@
   function handleDrop(e, targetFolderId, listEl) {
     e.preventDefault();
     listEl.classList.remove("gso-drag-over");
-
     if (!dragState.repoId) return;
 
     const sourceFolder = findFolder(dragState.folderId);
     const targetFolder = findFolder(targetFolderId);
-    if (!sourceFolder || !targetFolder) {
-      clearDropIndicators();
-      return;
-    }
+    if (!sourceFolder || !targetFolder) { clearDropIndicators(); return; }
 
     const repoIdx = sourceFolder.repos.findIndex(r => r.id === dragState.repoId);
-    if (repoIdx === -1) {
-      clearDropIndicators();
-      return;
-    }
+    if (repoIdx === -1) { clearDropIndicators(); return; }
 
     const [repo] = sourceFolder.repos.splice(repoIdx, 1);
-
     const indicator = listEl.querySelector(".gso-drop-indicator");
     let insertIdx = targetFolder.repos.length;
 
     if (indicator) {
-      const siblings = Array.from(listEl.querySelectorAll(".gso-repo-item:not(.gso-dragging)"));
-      const indicatorIdx = Array.from(listEl.children).indexOf(indicator);
       let count = 0;
       for (const child of listEl.children) {
         if (child === indicator) break;
@@ -169,10 +143,7 @@
       insertIdx = count;
     }
 
-    if (dragState.folderId === targetFolderId && insertIdx > repoIdx) {
-      insertIdx--;
-    }
-
+    if (dragState.folderId === targetFolderId && insertIdx > repoIdx) insertIdx--;
     targetFolder.repos.splice(insertIdx, 0, repo);
     clearDropIndicators();
     saveData();
@@ -204,17 +175,13 @@
   function deleteRepo(folderId, repoId) {
     const folder = findFolder(folderId);
     if (!folder) return;
-    const idx = folder.repos.findIndex(r => r.id === repoId);
-    if (idx === -1) return;
-    folder.repos.splice(idx, 1);
+    folder.repos = folder.repos.filter(r => r.id !== repoId);
     saveData();
     rerenderAll();
   }
 
   function deleteFolder(folderId) {
-    const idx = folders.findIndex(f => f.id === folderId);
-    if (idx === -1) return;
-    folders.splice(idx, 1);
+    folders = folders.filter(f => f.id !== folderId);
     saveData();
     rerenderAll();
   }
@@ -283,7 +250,6 @@
 
     const list = document.createElement("div");
     list.className = "gso-modal-list";
-
     const currentFolderId = getRepoFolder(repo.id);
 
     folders.forEach(folder => {
@@ -303,12 +269,8 @@
       count.textContent = folder.repos.length;
 
       item.append(check, name, count);
-
       item.addEventListener("click", () => {
-        if (folder.id === currentFolderId) {
-          modal.remove();
-          return;
-        }
+        if (folder.id === currentFolderId) { modal.remove(); return; }
         if (currentFolderId) {
           const src = findFolder(currentFolderId);
           if (src) src.repos = src.repos.filter(r => r.id !== repo.id);
@@ -344,7 +306,10 @@
         const src = findFolder(currentFolderId);
         if (src) src.repos = src.repos.filter(r => r.id !== repo.id);
       }
-      const newFolder = { id: generateId(), name, collapsed: false, repos: [{ id: repo.id, name: repo.name, url: repo.url, addedAt: Date.now() }] };
+      const newFolder = {
+        id: generateId(), name, collapsed: false,
+        repos: [{ id: repo.id, name: repo.name, url: repo.url, addedAt: Date.now() }]
+      };
       folders.push(newFolder);
       saveData();
       rerenderAll();
@@ -372,9 +337,7 @@
     el.draggable = true;
 
     const currentRepo = getCurrentRepo();
-    if (currentRepo && currentRepo.id === repo.id) {
-      el.classList.add("gso-repo-active");
-    }
+    if (currentRepo && currentRepo.id === repo.id) el.classList.add("gso-repo-active");
 
     const grip = document.createElement("span");
     grip.className = "gso-grip";
@@ -470,9 +433,7 @@
     list.className = "gso-repo-list" + (folder.collapsed ? " gso-hidden" : "");
     list.dataset.folderId = folder.id;
 
-    folder.repos.forEach(repo => {
-      list.appendChild(buildRepoEl(repo, folder));
-    });
+    folder.repos.forEach(repo => list.appendChild(buildRepoEl(repo, folder)));
 
     if (folder.repos.length === 0) {
       const empty = document.createElement("div");
@@ -481,7 +442,7 @@
       list.appendChild(empty);
     }
 
-    list.addEventListener("dragover", e => handleDragOver(e, folder.id, list));
+    list.addEventListener("dragover", e => handleDragOver(e, list));
     list.addEventListener("dragleave", e => handleDragLeave(e, list));
     list.addEventListener("drop", e => handleDrop(e, folder.id, list));
 
@@ -498,8 +459,8 @@
     menu.className = "gso-context-menu";
 
     const anchorRect = anchor.getBoundingClientRect();
-    const sidebar = document.getElementById("gso-sidebar");
-    const sidebarRect = sidebar.getBoundingClientRect();
+    menu.style.top = (anchorRect.bottom + 4) + "px";
+    menu.style.left = anchorRect.left + "px";
 
     const items = [
       {
@@ -545,11 +506,7 @@
       menu.appendChild(btn);
     });
 
-    const top = anchorRect.bottom - sidebarRect.top + sidebar.scrollTop;
-    const left = anchorRect.left - sidebarRect.left;
-    menu.style.top = top + "px";
-    menu.style.left = left + "px";
-    sidebar.appendChild(menu);
+    document.body.appendChild(menu);
 
     function closeMenu(e) {
       if (!menu.contains(e.target)) {
@@ -561,9 +518,7 @@
   }
 
   function updateActiveRepo() {
-    document.querySelectorAll(".gso-repo-item").forEach(el => {
-      el.classList.remove("gso-repo-active");
-    });
+    document.querySelectorAll(".gso-repo-item").forEach(el => el.classList.remove("gso-repo-active"));
     const currentRepo = getCurrentRepo();
     if (currentRepo) {
       const active = document.querySelector(`.gso-repo-item[data-repo-id="${CSS.escape(currentRepo.id)}"]`);
@@ -576,47 +531,56 @@
     if (!sidebar) return;
     const body = sidebar.querySelector(".gso-body");
     if (!body) return;
-
     body.innerHTML = "";
-    folders.forEach((folder, idx) => {
-      body.appendChild(buildFolderEl(folder, idx));
-    });
+    folders.forEach((folder, idx) => body.appendChild(buildFolderEl(folder, idx)));
     updateActiveRepo();
   }
 
-  function buildSidebar() {
-    const sidebar = document.createElement("div");
-    sidebar.id = "gso-sidebar";
-    if (preferences.position === "left") sidebar.classList.add("gso-position-left");
-    if (preferences.startCollapsed) sidebar.classList.add("gso-sidebar-collapsed");
-
-    const toggleBtn = document.createElement("button");
-    toggleBtn.id = "gso-toggle-btn";
-    toggleBtn.title = "Réduire/Agrandir";
-    toggleBtn.textContent = preferences.position === "left" ? "‹" : "›";
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("gso-sidebar-collapsed");
-      const collapsed = sidebar.classList.contains("gso-sidebar-collapsed");
-      if (preferences.position === "left") {
-        toggleBtn.textContent = collapsed ? "›" : "‹";
-      } else {
-        toggleBtn.textContent = collapsed ? "‹" : "›";
+  function findGitHubSidebar() {
+    const selectors = [
+      '[data-target="feed.dashboardSidebar"]',
+      'aside.dashboard-sidebar',
+      '[class*="dashboard-sidebar"]',
+      '.Layout-sidebar aside',
+      '.Layout-sidebar',
+      'aside[aria-label]',
+      'aside',
+    ];
+    for (const sel of selectors) {
+      const candidates = document.querySelectorAll(sel);
+      for (const el of candidates) {
+        if (el && !el.closest("#gso-sidebar") && el.offsetParent !== null) return el;
       }
-    });
+    }
+    return null;
+  }
+
+  function buildGSOSection() {
+    const section = document.createElement("div");
+    section.id = "gso-sidebar";
+    if (preferences.startCollapsed) section.classList.add("gso-sidebar-collapsed");
 
     const header = document.createElement("div");
     header.className = "gso-header";
 
-    const headerInner = document.createElement("div");
-    headerInner.className = "gso-header-inner";
+    const headerLeft = document.createElement("div");
+    headerLeft.className = "gso-header-left";
 
-    const logo = document.createElement("span");
-    logo.className = "gso-logo";
-    logo.textContent = "📁";
+    const collapseBtn = document.createElement("button");
+    collapseBtn.className = "gso-collapse-btn";
+    collapseBtn.title = "Réduire/Agrandir";
+    collapseBtn.textContent = preferences.startCollapsed ? "▸" : "▾";
+    collapseBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      section.classList.toggle("gso-sidebar-collapsed");
+      collapseBtn.textContent = section.classList.contains("gso-sidebar-collapsed") ? "▸" : "▾";
+    });
 
     const title = document.createElement("span");
     title.className = "gso-title";
     title.textContent = "My Repos";
+
+    headerLeft.append(collapseBtn, title);
 
     const addBtn = document.createElement("button");
     addBtn.className = "gso-btn-add";
@@ -631,15 +595,11 @@
       showAddModal(repo);
     });
 
-    headerInner.append(logo, title, addBtn);
-    header.appendChild(headerInner);
+    header.append(headerLeft, addBtn);
 
     const body = document.createElement("div");
     body.className = "gso-body";
-
-    folders.forEach((folder, idx) => {
-      body.appendChild(buildFolderEl(folder, idx));
-    });
+    folders.forEach((folder, idx) => body.appendChild(buildFolderEl(folder, idx)));
 
     const footer = document.createElement("div");
     footer.className = "gso-footer";
@@ -656,22 +616,49 @@
     });
 
     footer.appendChild(newFolderBtn);
+    section.append(header, body, footer);
+    return section;
+  }
 
-    sidebar.append(toggleBtn, header, body, footer);
-    document.body.appendChild(sidebar);
+  function injectIntoSidebar(ghSidebar) {
+    if (document.getElementById("gso-sidebar")) return;
+
+    const section = buildGSOSection();
+
+    const firstChild = ghSidebar.firstElementChild;
+    if (firstChild) {
+      ghSidebar.insertBefore(section, firstChild);
+    } else {
+      ghSidebar.appendChild(section);
+    }
 
     updateActiveRepo();
   }
 
-  function applySidebarPosition() {
-    const sidebar = document.getElementById("gso-sidebar");
-    if (!sidebar) return;
-    if (preferences.position === "left") {
-      sidebar.classList.add("gso-position-left");
-      sidebar.classList.remove("gso-position-right");
+  function waitForSidebar() {
+    const sidebar = findGitHubSidebar();
+    if (sidebar) {
+      injectIntoSidebar(sidebar);
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      const s = findGitHubSidebar();
+      if (s) {
+        observer.disconnect();
+        injectIntoSidebar(s);
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+    setTimeout(() => observer.disconnect(), 15000);
+  }
+
+  function reinjectIfNeeded() {
+    if (document.getElementById("gso-sidebar")) {
+      updateActiveRepo();
     } else {
-      sidebar.classList.remove("gso-position-left");
-      sidebar.classList.add("gso-position-right");
+      waitForSidebar();
     }
   }
 
@@ -683,7 +670,6 @@
     }
     if (changes.preferences) {
       preferences = changes.preferences.newValue || preferences;
-      applySidebarPosition();
     }
   });
 
@@ -691,27 +677,23 @@
     if (message.action === "PREFERENCES_UPDATED") {
       chrome.storage.local.get(["preferences"]).then(result => {
         preferences = result.preferences || preferences;
-        applySidebarPosition();
       });
     }
   });
 
   const titleEl = document.querySelector("title");
   if (titleEl) {
-    const titleObserver = new MutationObserver(() => {
-      updateActiveRepo();
-    });
+    const titleObserver = new MutationObserver(() => updateActiveRepo());
     titleObserver.observe(titleEl, { childList: true });
   }
 
-  window.addEventListener("popstate", updateActiveRepo);
-
-  document.addEventListener("turbo:load", updateActiveRepo);
-  document.addEventListener("pjax:end", updateActiveRepo);
+  window.addEventListener("popstate", reinjectIfNeeded);
+  document.addEventListener("turbo:load", reinjectIfNeeded);
+  document.addEventListener("pjax:end", reinjectIfNeeded);
 
   async function init() {
     await loadData();
-    buildSidebar();
+    waitForSidebar();
   }
 
   init();
