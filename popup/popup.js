@@ -1,6 +1,6 @@
 (async function () {
   let folders = [];
-  let preferences = { position: "right", startCollapsed: false, filterByOrg: false };
+  let preferences = { startCollapsed: false, filterByOrg: false };
 
   function showToast(msg, type = "success") {
     const toast = document.getElementById("popup-toast");
@@ -16,7 +16,7 @@
     try {
       const result = await chrome.storage.local.get(["folders", "preferences"]);
       folders = result.folders || [];
-      preferences = result.preferences || { position: "right", startCollapsed: false, filterByOrg: false };
+      preferences = result.preferences || { startCollapsed: false, filterByOrg: false };
     } catch (e) {
       console.error("[GSO popup] loadData:", e);
     }
@@ -41,24 +41,11 @@
   }
 
   function applyPreferences() {
-    const posGroup = document.getElementById("toggle-position");
-    posGroup.querySelectorAll(".toggle-option").forEach(btn => {
-      btn.classList.toggle("toggle-option-active", btn.dataset.value === preferences.position);
-    });
     document.getElementById("pref-start-collapsed").checked = preferences.startCollapsed;
     document.getElementById("pref-filter-org").checked = preferences.filterByOrg;
   }
 
   function bindPreferences() {
-    const posGroup = document.getElementById("toggle-position");
-    posGroup.querySelectorAll(".toggle-option").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        preferences.position = btn.dataset.value;
-        applyPreferences();
-        await savePreferences();
-      });
-    });
-
     document.getElementById("pref-start-collapsed").addEventListener("change", async e => {
       preferences.startCollapsed = e.target.checked;
       await savePreferences();

@@ -10,7 +10,6 @@ const DEFAULT_DATA = {
 };
 
 const DEFAULT_PREFERENCES = {
-  position: "right",
   startCollapsed: false,
   filterByOrg: false
 };
@@ -29,7 +28,7 @@ chrome.runtime.onInstalled.addListener(async () => {
   }
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === "GET_DATA") {
     chrome.storage.local.get(["folders", "preferences"])
       .then(data => sendResponse({ success: true, data }))
