@@ -184,16 +184,42 @@
     if (ancestor && ancestor.tagName !== 'BODY') ancestor.style.display = 'none';
   }
 
-  function waitForAndImportRepos() {
-    // Try immediately (repos may already be in DOM)
-    if (doImport()) { hideNativeRepoSection(); return; }
+  function findShowMoreBtn() {
+    for (const el of document.querySelectorAll('a, button')) {
+      if (el.closest('#gso-root')) continue;
+      if (!el.offsetParent) continue; // not visible
+      if (/show\s+more/i.test(el.textContent.trim())) return el;
+    }
+    return null;
+  }
 
-    // Otherwise observe until turbo-frame injects them
-    const obs = new MutationObserver(() => {
-      if (doImport()) { obs.disconnect(); hideNativeRepoSection(); }
-    });
+  function waitForAndImportRepos() {
+    let lastCount = 0;
+
+    function step() {
+      const links = document.querySelectorAll('a[data-hovercard-type="repository"]');
+
+      // Import any newly visible repos
+      if (links.length > lastCount) {
+        lastCount = links.length;
+        doImport();
+      }
+
+      // If there's a "Show more" button, click it and let the observer catch the result
+      const btn = findShowMoreBtn();
+      if (btn) { btn.click(); return false; }
+
+      // No button left → done
+      if (links.length > 0) { hideNativeRepoSection(); return true; }
+      return false;
+    }
+
+    if (step()) return;
+
+    const obs = new MutationObserver(() => { if (step()) obs.disconnect(); });
     obs.observe(document.body, { childList: true, subtree: true });
-    setTimeout(() => obs.disconnect(), 15000);
+    // Safety timeout: import whatever is there and hide
+    setTimeout(() => { obs.disconnect(); doImport(); hideNativeRepoSection(); }, 15000);
   }
 
   // ── Drag & Drop ──────────────────────────────────────────────────────────────
