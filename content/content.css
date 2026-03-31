@@ -1,12 +1,89 @@
+/* ── Colour tokens ─────────────────────────────────────────────────────────────
+   Declared on every overlay root so all children just use --gso-*.
+   Light values first, then overridden for dark via GitHub's data-color-mode
+   attribute and a prefers-color-scheme media query fallback.              */
+
+#gso-root,
+#gso-ctx,
+#gso-modal {
+  --gso-fg:           var(--color-fg-default,      #1f2328);
+  --gso-fg-muted:     var(--color-fg-muted,         #656d76);
+  --gso-fg-subtle:    var(--color-fg-subtle,        #6e7781);
+  --gso-bg-hover:     var(--color-action-list-item-default-hover-bg, rgba(175,184,193,0.2));
+  --gso-bg-active:    var(--color-action-list-item-default-active-bg, rgba(9,105,218,0.08));
+  --gso-canvas:       var(--color-canvas-default,   #ffffff);
+  --gso-canvas-sub:   var(--color-canvas-subtle,    #f6f8fa);
+  --gso-border:       var(--color-border-default,   #d0d7de);
+  --gso-border-m:     var(--color-border-muted,     #d8dee4);
+  --gso-accent:       var(--color-accent-fg,        #0969da);
+  --gso-accent-em:    var(--color-accent-emphasis,  #0969da);
+  --gso-accent-sub:   var(--color-accent-subtle,    rgba(9,105,218,0.1));
+  --gso-accent-muted: var(--color-accent-muted,     rgba(9,105,218,0.3));
+  --gso-danger:       var(--color-danger-fg,        #cf222e);
+  --gso-neutral:      var(--color-neutral-muted,    rgba(175,184,193,0.2));
+  --gso-folder-ico:   var(--color-attention-fg,     #9a6700);
+}
+
+/* Dark theme — GitHub sets data-color-mode="dark" or data-color-mode="auto"
+   with data-dark-theme on <html>                                           */
+html[data-color-mode="dark"] #gso-root,
+html[data-color-mode="dark"] #gso-ctx,
+html[data-color-mode="dark"] #gso-modal,
+html[data-color-mode="auto"][data-dark-theme] #gso-root,
+html[data-color-mode="auto"][data-dark-theme] #gso-ctx,
+html[data-color-mode="auto"][data-dark-theme] #gso-modal {
+  --gso-fg:           var(--color-fg-default,      #e6edf3);
+  --gso-fg-muted:     var(--color-fg-muted,         #8b949e);
+  --gso-fg-subtle:    var(--color-fg-subtle,        #6e7781);
+  --gso-bg-hover:     var(--color-action-list-item-default-hover-bg, rgba(177,186,196,0.12));
+  --gso-bg-active:    var(--color-action-list-item-default-active-bg, rgba(56,139,253,0.15));
+  --gso-canvas:       var(--color-canvas-default,   #0d1117);
+  --gso-canvas-sub:   var(--color-canvas-subtle,    #161b22);
+  --gso-border:       var(--color-border-default,   #30363d);
+  --gso-border-m:     var(--color-border-muted,     #21262d);
+  --gso-accent:       var(--color-accent-fg,        #2f81f7);
+  --gso-accent-em:    var(--color-accent-emphasis,  #1f6feb);
+  --gso-accent-sub:   var(--color-accent-subtle,    rgba(56,139,253,0.1));
+  --gso-accent-muted: var(--color-accent-muted,     rgba(56,139,253,0.4));
+  --gso-danger:       var(--color-danger-fg,        #f85149);
+  --gso-neutral:      var(--color-neutral-muted,    rgba(110,118,129,0.4));
+  --gso-folder-ico:   var(--color-attention-fg,     #d29922);
+}
+
+/* System dark mode fallback */
+@media (prefers-color-scheme: dark) {
+  #gso-root,
+  #gso-ctx,
+  #gso-modal {
+    --gso-fg:           var(--color-fg-default,      #e6edf3);
+    --gso-fg-muted:     var(--color-fg-muted,         #8b949e);
+    --gso-fg-subtle:    var(--color-fg-subtle,        #6e7781);
+    --gso-bg-hover:     var(--color-action-list-item-default-hover-bg, rgba(177,186,196,0.12));
+    --gso-bg-active:    var(--color-action-list-item-default-active-bg, rgba(56,139,253,0.15));
+    --gso-canvas:       var(--color-canvas-default,   #0d1117);
+    --gso-canvas-sub:   var(--color-canvas-subtle,    #161b22);
+    --gso-border:       var(--color-border-default,   #30363d);
+    --gso-border-m:     var(--color-border-muted,     #21262d);
+    --gso-accent:       var(--color-accent-fg,        #2f81f7);
+    --gso-accent-em:    var(--color-accent-emphasis,  #1f6feb);
+    --gso-accent-sub:   var(--color-accent-subtle,    rgba(56,139,253,0.1));
+    --gso-accent-muted: var(--color-accent-muted,     rgba(56,139,253,0.4));
+    --gso-danger:       var(--color-danger-fg,        #f85149);
+    --gso-neutral:      var(--color-neutral-muted,    rgba(110,118,129,0.4));
+    --gso-folder-ico:   var(--color-attention-fg,     #d29922);
+  }
+}
+
 /* ── Root ───────────────────────────────────────────────────────────────────── */
 #gso-root {
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--color-border-muted, #d8dee4);
+  border-bottom: 1px solid var(--gso-border-m);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color: var(--gso-fg);
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────────── */
+/* ── Section header ─────────────────────────────────────────────────────────── */
 .gso-hdr {
   display: flex;
   align-items: center;
@@ -23,12 +100,12 @@
 .gso-hdr-title {
   font-size: 12px;
   font-weight: 600;
-  color: var(--color-fg-muted, #656d76);
+  color: var(--gso-fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-/* ── Shared icon button ──────────────────────────────────────────────────────── */
+/* ── Icon buttons ────────────────────────────────────────────────────────────── */
 .gso-ico-btn {
   display: inline-flex;
   align-items: center;
@@ -39,29 +116,27 @@
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--color-fg-muted, #656d76);
+  color: var(--gso-fg-muted);
   cursor: pointer;
   flex-shrink: 0;
   transition: background 120ms, color 120ms;
 }
 
 .gso-ico-btn:hover {
-  background: var(--color-action-list-item-default-hover-bg, rgba(175, 184, 193, 0.2));
-  color: var(--color-fg-default, #1f2328);
+  background: var(--gso-bg-hover);
+  color: var(--gso-fg);
 }
 
-/* Chevron for collapse */
 .gso-collapse-btn { width: 18px; height: 18px; }
 
 .gso-chev {
-  transition: transform 200ms ease;
   display: block;
+  transition: transform 200ms ease;
 }
 
-/* Add button */
 .gso-add-btn:hover {
-  color: var(--color-accent-fg, #0969da);
-  background: var(--color-accent-subtle, rgba(9, 105, 218, 0.1));
+  color: var(--gso-accent);
+  background: var(--gso-accent-sub);
 }
 
 /* ── Body ────────────────────────────────────────────────────────────────────── */
@@ -72,9 +147,7 @@
 }
 
 /* ── Folder ──────────────────────────────────────────────────────────────────── */
-.gso-folder {
-  border-radius: 8px;
-}
+.gso-folder { border-radius: 8px; }
 
 .gso-folder-hdr {
   display: flex;
@@ -88,38 +161,32 @@
   transition: background 120ms;
 }
 
-.gso-folder-hdr:hover {
-  background: var(--color-action-list-item-default-hover-bg, rgba(175, 184, 193, 0.2));
-}
+.gso-folder-hdr:hover { background: var(--gso-bg-hover); }
 
 .gso-arrow {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  color: var(--color-fg-subtle, #6e7781);
+  color: var(--gso-fg-subtle);
   transition: transform 200ms ease;
 }
 
-.gso-arrow.open {
-  transform: rotate(90deg);
-}
+.gso-arrow.open { transform: rotate(90deg); }
 
 .gso-ico {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  color: var(--color-fg-muted, #656d76);
+  color: var(--gso-fg-muted);
 }
 
-.gso-folder-ico {
-  color: var(--color-attention-fg, #9a6700);
-}
+.gso-folder-ico { color: var(--gso-folder-ico); }
 
 .gso-folder-name {
   flex: 1;
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-fg-default, #1f2328);
+  color: var(--gso-fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -134,8 +201,8 @@
   font-size: 11px;
   font-weight: 500;
   border-radius: 2em;
-  background: var(--color-neutral-muted, rgba(175, 184, 193, 0.2));
-  color: var(--color-fg-muted, #656d76);
+  background: var(--gso-neutral);
+  color: var(--gso-fg-muted);
 }
 
 .gso-menu-btn {
@@ -143,23 +210,16 @@
   transition: opacity 120ms, background 120ms, color 120ms;
 }
 
-.gso-folder-hdr:hover .gso-menu-btn {
-  opacity: 1;
-}
+.gso-folder-hdr:hover .gso-menu-btn { opacity: 1; }
 
 /* ── Folder list ─────────────────────────────────────────────────────────────── */
-.gso-folder-list {
-  padding: 2px 0 2px 12px;
-}
-
-.gso-folder-list.collapsed {
-  display: none;
-}
+.gso-folder-list { padding: 2px 0 2px 12px; }
+.gso-folder-list.collapsed { display: none; }
 
 .gso-folder-list.gso-drop-over {
-  background: var(--color-accent-subtle, rgba(9, 105, 218, 0.08));
+  background: var(--gso-accent-sub);
   border-radius: 6px;
-  outline: 1.5px dashed var(--color-accent-fg, #0969da);
+  outline: 1.5px dashed var(--gso-accent);
   outline-offset: -1px;
 }
 
@@ -176,28 +236,22 @@
   position: relative;
 }
 
-.gso-repo-item:hover {
-  background: var(--color-action-list-item-default-hover-bg, rgba(175, 184, 193, 0.2));
-}
+.gso-repo-item:hover { background: var(--gso-bg-hover); }
 
-.gso-repo-item.gso-active {
-  background: var(--color-action-list-item-default-active-bg, rgba(9, 105, 218, 0.08));
-}
+.gso-repo-item.gso-active { background: var(--gso-bg-active); }
 
 .gso-repo-item.gso-active .gso-repo-link {
-  color: var(--color-accent-fg, #0969da);
+  color: var(--gso-accent);
   font-weight: 600;
 }
 
-.gso-repo-item.gso-dragging {
-  opacity: 0.35;
-}
+.gso-repo-item.gso-dragging { opacity: 0.35; }
 
-/* ── Discord-style folder-creation merge preview ─────────────────────────────── */
+/* ── Discord-style folder-creation preview ───────────────────────────────────── */
 .gso-repo-item.gso-merge-over {
-  background: var(--color-accent-emphasis, #0969da);
+  background: var(--gso-accent-em);
   border-radius: 10px;
-  outline: 2px solid var(--color-accent-fg, #0969da);
+  outline: 2px solid var(--gso-accent);
   outline-offset: 2px;
   transition: background 80ms, border-radius 80ms;
 }
@@ -207,7 +261,6 @@
   color: #ffffff;
 }
 
-/* Folder icon hint that appears on merge-over */
 .gso-repo-item.gso-merge-over::after {
   content: '';
   position: absolute;
@@ -223,12 +276,21 @@
   pointer-events: none;
 }
 
+/* ── Owner avatar ────────────────────────────────────────────────────────────── */
+.gso-avatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+}
+
 /* ── Drag grip ───────────────────────────────────────────────────────────────── */
 .gso-grip {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  color: var(--color-fg-subtle, #6e7781);
+  color: var(--gso-fg-subtle);
   cursor: grab;
   opacity: 0;
   transition: opacity 120ms;
@@ -242,7 +304,7 @@
 .gso-repo-link {
   flex: 1;
   font-size: 14px;
-  color: var(--color-fg-default, #1f2328);
+  color: var(--gso-fg);
   text-decoration: none;
   white-space: nowrap;
   overflow: hidden;
@@ -251,9 +313,7 @@
   cursor: pointer;
 }
 
-.gso-repo-link:hover {
-  color: var(--color-accent-fg, #0969da);
-}
+.gso-repo-link:hover { color: var(--gso-accent); }
 
 /* ── Delete button ───────────────────────────────────────────────────────────── */
 .gso-del {
@@ -266,31 +326,29 @@
 .gso-repo-item:hover .gso-del { opacity: 1; }
 
 .gso-del:hover {
-  color: var(--color-danger-fg, #cf222e) !important;
-  background: rgba(207, 34, 46, 0.1) !important;
+  color: var(--gso-danger) !important;
+  background: rgba(207, 34, 46, 0.12) !important;
 }
 
 /* ── Drop line ───────────────────────────────────────────────────────────────── */
 .gso-drop-line {
   height: 2px;
-  background: var(--color-accent-fg, #0969da);
+  background: var(--gso-accent);
   border-radius: 1px;
   margin: 2px 0;
   pointer-events: none;
 }
 
-/* ── Empty folder placeholder ────────────────────────────────────────────────── */
+/* ── Empty folder ────────────────────────────────────────────────────────────── */
 .gso-empty {
   padding: 4px 8px;
   font-size: 12px;
-  color: var(--color-fg-subtle, #6e7781);
+  color: var(--gso-fg-subtle);
   font-style: italic;
 }
 
 /* ── Footer ──────────────────────────────────────────────────────────────────── */
-.gso-footer {
-  margin-top: 4px;
-}
+.gso-footer { margin-top: 4px; }
 
 .gso-btn-new-folder {
   display: flex;
@@ -298,33 +356,33 @@
   gap: 6px;
   width: 100%;
   padding: 5px 8px;
-  border: 1px dashed var(--color-border-default, #d0d7de);
+  border: 1px dashed var(--gso-border);
   background: transparent;
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  color: var(--color-fg-muted, #656d76);
+  color: var(--gso-fg-muted);
   transition: border-color 150ms, color 150ms, background 150ms;
 }
 
 .gso-btn-new-folder:hover {
-  border-color: var(--color-accent-fg, #0969da);
-  color: var(--color-accent-fg, #0969da);
-  background: var(--color-accent-subtle, rgba(9, 105, 218, 0.08));
+  border-color: var(--gso-accent);
+  color: var(--gso-accent);
+  background: var(--gso-accent-sub);
 }
 
-/* ── Inline rename input ─────────────────────────────────────────────────────── */
+/* ── Inline rename ───────────────────────────────────────────────────────────── */
 .gso-rename-inp {
   width: 100%;
-  border: 1px solid var(--color-accent-fg, #0969da);
+  border: 1px solid var(--gso-accent);
   border-radius: 4px;
   padding: 2px 5px;
   font-size: 14px;
   font-family: inherit;
-  background: var(--color-canvas-default, #ffffff);
-  color: var(--color-fg-default, #1f2328);
+  background: var(--gso-canvas);
+  color: var(--gso-fg);
   outline: none;
-  box-shadow: 0 0 0 3px var(--color-accent-muted, rgba(9, 105, 218, 0.3));
+  box-shadow: 0 0 0 3px var(--gso-accent-muted);
   min-width: 0;
 }
 
@@ -332,12 +390,13 @@
 #gso-ctx {
   position: fixed;
   z-index: 10002;
-  background: var(--color-canvas-overlay, #ffffff);
-  border: 1px solid var(--color-border-default, #d0d7de);
+  background: var(--gso-canvas);
+  border: 1px solid var(--gso-border);
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(140, 149, 159, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   padding: 4px;
   min-width: 150px;
+  color: var(--gso-fg);
 }
 
 .gso-ctx-item {
@@ -349,16 +408,16 @@
   border-radius: 5px;
   font-size: 14px;
   font-family: inherit;
-  color: var(--color-fg-default, #1f2328);
+  color: var(--gso-fg);
   cursor: pointer;
   text-align: left;
   white-space: nowrap;
   transition: background 100ms;
 }
 
-.gso-ctx-item:hover { background: var(--color-action-list-item-default-hover-bg, rgba(175, 184, 193, 0.2)); }
-.gso-ctx-item.danger { color: var(--color-danger-fg, #cf222e); }
-.gso-ctx-item.danger:hover { background: rgba(207, 34, 46, 0.08); }
+.gso-ctx-item:hover { background: var(--gso-bg-hover); }
+.gso-ctx-item.danger { color: var(--gso-danger); }
+.gso-ctx-item.danger:hover { background: rgba(207, 34, 46, 0.1); }
 .gso-ctx-item.disabled { opacity: 0.4; pointer-events: none; }
 
 /* ── Modal ───────────────────────────────────────────────────────────────────── */
@@ -369,22 +428,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--gso-fg);
 }
 
 .gso-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
 }
 
 .gso-modal-box {
   position: relative;
   z-index: 1;
-  background: var(--color-canvas-default, #ffffff);
-  border: 1px solid var(--color-border-default, #d0d7de);
+  background: var(--gso-canvas);
+  border: 1px solid var(--gso-border);
   border-radius: 12px;
-  box-shadow: 0 16px 48px rgba(1, 4, 9, 0.3);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
   padding: 20px;
   width: 340px;
   max-height: 80vh;
@@ -394,7 +454,7 @@
 .gso-modal-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--color-fg-default, #1f2328);
+  color: var(--gso-fg);
   margin-bottom: 14px;
 }
 
@@ -414,17 +474,18 @@
   border: 1px solid transparent;
   cursor: pointer;
   font-size: 14px;
+  color: var(--gso-fg);
   transition: background 100ms, border-color 100ms;
 }
 
 .gso-modal-item:hover {
-  background: var(--color-action-list-item-default-hover-bg, rgba(175, 184, 193, 0.2));
-  border-color: var(--color-border-muted, #d8dee4);
+  background: var(--gso-bg-hover);
+  border-color: var(--gso-border-m);
 }
 
 .gso-modal-item.active {
-  background: var(--color-accent-subtle, rgba(9, 105, 218, 0.08));
-  border-color: var(--color-accent-fg, #0969da);
+  background: var(--gso-accent-sub);
+  border-color: var(--gso-accent);
 }
 
 .gso-modal-check {
@@ -432,7 +493,7 @@
   flex-shrink: 0;
   font-size: 12px;
   font-weight: 700;
-  color: var(--color-accent-fg, #0969da);
+  color: var(--gso-accent);
 }
 
 .gso-modal-item span:nth-child(2) { flex: 1; }
@@ -447,7 +508,7 @@
 .gso-inp-wrap {
   display: flex;
   align-items: center;
-  border: 1px solid var(--color-border-default, #d0d7de);
+  border: 1px solid var(--gso-border);
   border-radius: 6px;
   overflow: hidden;
   margin-bottom: 12px;
@@ -455,37 +516,37 @@
 }
 
 .gso-inp-wrap:focus-within {
-  border-color: var(--color-accent-fg, #0969da);
-  box-shadow: 0 0 0 3px var(--color-accent-muted, rgba(9, 105, 218, 0.3));
+  border-color: var(--gso-accent);
+  box-shadow: 0 0 0 3px var(--gso-accent-muted);
 }
 
 .gso-inp-pfx {
   padding: 6px 8px;
   font-size: 12px;
-  color: var(--color-fg-muted, #656d76);
-  background: var(--color-canvas-subtle, #f6f8fa);
-  border-right: 1px solid var(--color-border-muted, #d8dee4);
+  color: var(--gso-fg-muted);
+  background: var(--gso-canvas-sub);
+  border-right: 1px solid var(--gso-border-m);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 .gso-inp {
   flex: 1;
-  border: 1px solid var(--color-border-default, #d0d7de);
+  border: 1px solid var(--gso-border);
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 14px;
   font-family: inherit;
-  background: var(--color-canvas-default, #ffffff);
-  color: var(--color-fg-default, #1f2328);
+  background: var(--gso-canvas);
+  color: var(--gso-fg);
   outline: none;
   width: 100%;
   transition: border-color 150ms, box-shadow 150ms;
 }
 
 .gso-inp:focus {
-  border-color: var(--color-accent-fg, #0969da);
-  box-shadow: 0 0 0 3px var(--color-accent-muted, rgba(9, 105, 218, 0.3));
+  border-color: var(--gso-accent);
+  box-shadow: 0 0 0 3px var(--gso-accent-muted);
 }
 
 .gso-inp-wrap .gso-inp {
@@ -494,10 +555,10 @@
   box-shadow: none;
 }
 
-/* ── Buttons (modal) ─────────────────────────────────────────────────────────── */
+/* ── Buttons ─────────────────────────────────────────────────────────────────── */
 .gso-btn-primary {
   padding: 6px 14px;
-  background: var(--color-accent-emphasis, #0969da);
+  background: var(--gso-accent-em);
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -516,14 +577,14 @@
   width: 100%;
   padding: 6px;
   margin-top: 6px;
-  border: 1px solid var(--color-border-default, #d0d7de);
+  border: 1px solid var(--gso-border);
   background: transparent;
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
-  color: var(--color-fg-muted, #656d76);
+  color: var(--gso-fg-muted);
   cursor: pointer;
   transition: background 100ms;
 }
 
-.gso-btn-cancel:hover { background: var(--color-canvas-subtle, #f6f8fa); }
+.gso-btn-cancel:hover { background: var(--gso-canvas-sub); }

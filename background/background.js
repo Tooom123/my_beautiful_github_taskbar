@@ -2,7 +2,7 @@ const DEFAULT_DATA = {
   folders: [
     {
       id: "default",
-      name: "Favoris",
+      name: "Tous mes repos",
       collapsed: false,
       repos: []
     }

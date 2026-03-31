@@ -48,9 +48,9 @@
       const r = await store.local.get(['folders']);
       folders = r.folders && r.folders.length
         ? r.folders
-        : [{ id: 'default', name: 'Favoris', collapsed: false, repos: [] }];
+        : [{ id: 'default', name: 'Tous mes repos', collapsed: false, repos: [] }];
     } catch {
-      folders = [{ id: 'default', name: 'Favoris', collapsed: false, repos: [] }];
+      folders = [{ id: 'default', name: 'Tous mes repos', collapsed: false, repos: [] }];
     }
   }
 
@@ -132,6 +132,68 @@
         }
       } catch { /* continue */ }
     }
+  }
+
+  // ── Scrape + import native GitHub repo list ──────────────────────────────────
+  // GitHub marks repo links with data-hovercard-type="repository".
+  // The list lives in a <turbo-frame> loaded AFTER the sidebar, so we observe.
+
+  function doImport() {
+    const links = document.querySelectorAll('a[data-hovercard-type="repository"]');
+    if (!links.length) return false;
+
+    const known = new Set(folders.flatMap(f => f.repos.map(r => r.id)));
+    const inbox = folders[0];
+    let added = false;
+    const seen = new Set();
+
+    for (const a of links) {
+      const href = a.getAttribute('href') || '';
+      const m = href.match(/^\/([^/?#]+\/[^/?#]+)\/?$/);
+      if (!m) continue;
+      const id = m[1];
+      if (seen.has(id) || known.has(id)) continue;
+      seen.add(id);
+      inbox.repos.push({ id, name: id, url: 'https://github.com/' + id, addedAt: Date.now() });
+      added = true;
+    }
+    if (added) { schedSave(); render(); }
+    return true;
+  }
+
+  function hideNativeRepoSection() {
+    // 1. turbo-frame whose src points to the top-repos endpoint
+    for (const f of document.querySelectorAll('turbo-frame[src]')) {
+      if (f.src.includes('top_repositories') || f.src.includes('my_top_repositories')) {
+        f.style.display = 'none'; return;
+      }
+    }
+    // 2. Find the nearest shared ancestor of all repo links and hide it
+    const links = [...document.querySelectorAll('a[data-hovercard-type="repository"]')];
+    if (!links.length) return;
+    let ancestor = links[0].parentElement;
+    while (ancestor && ancestor.tagName !== 'BODY') {
+      if (ancestor.querySelectorAll('a[data-hovercard-type="repository"]').length === links.length) {
+        // Walk one more level up to include the "Top repositories" heading
+        const parent = ancestor.parentElement;
+        if (parent && parent.tagName !== 'BODY') ancestor = parent;
+        break;
+      }
+      ancestor = ancestor.parentElement;
+    }
+    if (ancestor && ancestor.tagName !== 'BODY') ancestor.style.display = 'none';
+  }
+
+  function waitForAndImportRepos() {
+    // Try immediately (repos may already be in DOM)
+    if (doImport()) { hideNativeRepoSection(); return; }
+
+    // Otherwise observe until turbo-frame injects them
+    const obs = new MutationObserver(() => {
+      if (doImport()) { obs.disconnect(); hideNativeRepoSection(); }
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+    setTimeout(() => obs.disconnect(), 15000);
   }
 
   // ── Drag & Drop ──────────────────────────────────────────────────────────────
@@ -306,10 +368,14 @@
       + '<circle cx="3" cy="8" r="1.3"/><circle cx="7" cy="8" r="1.3"/>'
       + '<circle cx="3" cy="12" r="1.3"/><circle cx="7" cy="12" r="1.3"/></svg>';
 
+    const owner = repo.id.split('/')[0];
     const ico = mkEl('span', 'gso-ico');
-    ico.appendChild(svgPath(
-      'M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8Z',
-      14));
+    const avatar = mkEl('img', 'gso-avatar');
+    avatar.src = `https://github.com/${owner}.png?size=32`;
+    avatar.alt = owner;
+    avatar.width = 16;
+    avatar.height = 16;
+    ico.appendChild(avatar);
 
     const link = mkEl('a', 'gso-repo-link');
     link.href = repo.url;
@@ -597,9 +663,9 @@
   // ── Injection ─────────────────────────────────────────────────────────────────
   function inject(sidebar) {
     if (document.getElementById('gso-root')) return;
-    hideNativeRepos(sidebar);
     sidebar.prepend(buildSection());
     render();
+    waitForAndImportRepos();
   }
 
   function waitForSidebar() {
