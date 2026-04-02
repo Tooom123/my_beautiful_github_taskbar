@@ -134,10 +134,6 @@
     }
   }
 
-  // ── Scrape + import native GitHub repo list ──────────────────────────────────
-  // GitHub marks repo links with data-hovercard-type="repository".
-  // The list lives in a <turbo-frame> loaded AFTER the sidebar, so we observe.
-
   function doImport() {
     const links = document.querySelectorAll('a[data-hovercard-type="repository"]');
     if (!links.length) return false;
@@ -187,39 +183,48 @@
   function findShowMoreBtn() {
     for (const el of document.querySelectorAll('a, button')) {
       if (el.closest('#gso-root')) continue;
-      if (!el.offsetParent) continue; // not visible
-      if (/show\s+more/i.test(el.textContent.trim())) return el;
+      if (!el.offsetParent) continue;
+      if (/^show\s+more$/i.test(el.textContent.trim())) return el;
     }
     return null;
   }
 
+  // Polling-based (no MutationObserver) — avoids self-triggering loops
   function waitForAndImportRepos() {
     let lastCount = 0;
+    let clickedBtn = null;
+    let finished = false;
+    let ticks = 0;
+    const MAX_TICKS = 40; // 40 × 750 ms = 30 s hard limit
 
-    function step() {
-      const links = document.querySelectorAll('a[data-hovercard-type="repository"]');
-
-      // Import any newly visible repos
-      if (links.length > lastCount) {
-        lastCount = links.length;
-        doImport();
-      }
-
-      // If there's a "Show more" button, click it and let the observer catch the result
-      const btn = findShowMoreBtn();
-      if (btn) { btn.click(); return false; }
-
-      // No button left → done
-      if (links.length > 0) { hideNativeRepoSection(); return true; }
-      return false;
+    function done() {
+      if (finished) return;
+      finished = true;
+      doImport();
+      hideNativeRepoSection();
     }
 
-    if (step()) return;
+    function tick() {
+      if (finished) return;
+      if (++ticks > MAX_TICKS) { done(); return; }
 
-    const obs = new MutationObserver(() => { if (step()) obs.disconnect(); });
-    obs.observe(document.body, { childList: true, subtree: true });
-    // Safety timeout: import whatever is there and hide
-    setTimeout(() => { obs.disconnect(); doImport(); hideNativeRepoSection(); }, 15000);
+      const links = document.querySelectorAll('a[data-hovercard-type="repository"]');
+      if (links.length > lastCount) lastCount = links.length;
+
+      const btn = findShowMoreBtn();
+      if (btn && btn !== clickedBtn) {
+        clickedBtn = btn;
+        btn.click();
+        setTimeout(tick, 1200); // longer pause after a click
+        return;
+      }
+
+      if (!btn && lastCount > 0) { done(); return; }
+
+      setTimeout(tick, 750);
+    }
+
+    setTimeout(tick, 800); // initial wait for turbo-frame
   }
 
   // ── Drag & Drop ──────────────────────────────────────────────────────────────

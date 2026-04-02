@@ -1,7 +1,3 @@
-/* ── Colour tokens ─────────────────────────────────────────────────────────────
-   Declared on every overlay root so all children just use --gso-*.
-   Light values first, then overridden for dark via GitHub's data-color-mode
-   attribute and a prefers-color-scheme media query fallback.              */
 
 #gso-root,
 #gso-ctx,
@@ -24,8 +20,7 @@
   --gso-folder-ico:   var(--color-attention-fg,     #9a6700);
 }
 
-/* Dark theme — GitHub sets data-color-mode="dark" or data-color-mode="auto"
-   with data-dark-theme on <html>                                           */
+
 html[data-color-mode="dark"] #gso-root,
 html[data-color-mode="dark"] #gso-ctx,
 html[data-color-mode="dark"] #gso-modal,
@@ -50,7 +45,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   --gso-folder-ico:   var(--color-attention-fg,     #d29922);
 }
 
-/* System dark mode fallback */
 @media (prefers-color-scheme: dark) {
   #gso-root,
   #gso-ctx,
@@ -74,7 +68,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   }
 }
 
-/* ── Root ───────────────────────────────────────────────────────────────────── */
 #gso-root {
   margin-bottom: 16px;
   padding-bottom: 12px;
@@ -83,7 +76,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   color: var(--gso-fg);
 }
 
-/* ── Section header ─────────────────────────────────────────────────────────── */
 .gso-hdr {
   display: flex;
   align-items: center;
@@ -105,7 +97,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   letter-spacing: 0.04em;
 }
 
-/* ── Icon buttons ────────────────────────────────────────────────────────────── */
 .gso-ico-btn {
   display: inline-flex;
   align-items: center;
@@ -139,14 +130,12 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   background: var(--gso-accent-sub);
 }
 
-/* ── Body ────────────────────────────────────────────────────────────────────── */
 .gso-body {
   display: flex;
   flex-direction: column;
   gap: 1px;
 }
 
-/* ── Folder ──────────────────────────────────────────────────────────────────── */
 .gso-folder { border-radius: 8px; }
 
 .gso-folder-hdr {
@@ -212,7 +201,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
 
 .gso-folder-hdr:hover .gso-menu-btn { opacity: 1; }
 
-/* ── Folder list ─────────────────────────────────────────────────────────────── */
 .gso-folder-list { padding: 2px 0 2px 12px; }
 .gso-folder-list.collapsed { display: none; }
 
@@ -223,7 +211,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   outline-offset: -1px;
 }
 
-/* ── Repo item ───────────────────────────────────────────────────────────────── */
 .gso-repo-item {
   display: flex;
   align-items: center;
@@ -247,7 +234,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
 
 .gso-repo-item.gso-dragging { opacity: 0.35; }
 
-/* ── Discord-style folder-creation preview ───────────────────────────────────── */
 .gso-repo-item.gso-merge-over {
   background: var(--gso-accent-em);
   border-radius: 10px;
@@ -276,7 +262,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   pointer-events: none;
 }
 
-/* ── Owner avatar ────────────────────────────────────────────────────────────── */
 .gso-avatar {
   width: 16px;
   height: 16px;
@@ -285,7 +270,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   object-fit: cover;
 }
 
-/* ── Drag grip ───────────────────────────────────────────────────────────────── */
 .gso-grip {
   display: inline-flex;
   align-items: center;
@@ -300,7 +284,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
 .gso-repo-item:hover .gso-grip { opacity: 1; }
 .gso-grip:active { cursor: grabbing; }
 
-/* ── Repo link ───────────────────────────────────────────────────────────────── */
 .gso-repo-link {
   flex: 1;
   font-size: 14px;
@@ -315,7 +298,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
 
 .gso-repo-link:hover { color: var(--gso-accent); }
 
-/* ── Delete button ───────────────────────────────────────────────────────────── */
 .gso-del {
   width: 20px;
   height: 20px;
@@ -330,7 +312,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   background: rgba(207, 34, 46, 0.12) !important;
 }
 
-/* ── Drop line ───────────────────────────────────────────────────────────────── */
 .gso-drop-line {
   height: 2px;
   background: var(--gso-accent);
@@ -339,7 +320,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   pointer-events: none;
 }
 
-/* ── Empty folder ────────────────────────────────────────────────────────────── */
 .gso-empty {
   padding: 4px 8px;
   font-size: 12px;
@@ -347,7 +327,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   font-style: italic;
 }
 
-/* ── Footer ──────────────────────────────────────────────────────────────────── */
 .gso-footer { margin-top: 4px; }
 
 .gso-btn-new-folder {
@@ -371,7 +350,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   background: var(--gso-accent-sub);
 }
 
-/* ── Inline rename ───────────────────────────────────────────────────────────── */
 .gso-rename-inp {
   width: 100%;
   border: 1px solid var(--gso-accent);
@@ -386,7 +364,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   min-width: 0;
 }
 
-/* ── Context menu ────────────────────────────────────────────────────────────── */
 #gso-ctx {
   position: fixed;
   z-index: 10002;
@@ -420,7 +397,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
 .gso-ctx-item.danger:hover { background: rgba(207, 34, 46, 0.1); }
 .gso-ctx-item.disabled { opacity: 0.4; pointer-events: none; }
 
-/* ── Modal ───────────────────────────────────────────────────────────────────── */
 #gso-modal {
   position: fixed;
   inset: 0;
@@ -432,10 +408,11 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
 }
 
 .gso-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
+  z-index: 9999;
 }
 
 .gso-modal-box {
@@ -504,7 +481,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   margin-bottom: 10px;
 }
 
-/* ── Inputs ──────────────────────────────────────────────────────────────────── */
 .gso-inp-wrap {
   display: flex;
   align-items: center;
@@ -555,7 +531,6 @@ html[data-color-mode="auto"][data-dark-theme] #gso-modal {
   box-shadow: none;
 }
 
-/* ── Buttons ─────────────────────────────────────────────────────────────────── */
 .gso-btn-primary {
   padding: 6px 14px;
   background: var(--gso-accent-em);
