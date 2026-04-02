@@ -157,29 +157,6 @@
     return true;
   }
 
-  function hideNativeRepoSection() {
-    // 1. turbo-frame whose src points to the top-repos endpoint
-    for (const f of document.querySelectorAll('turbo-frame[src]')) {
-      if (f.src.includes('top_repositories') || f.src.includes('my_top_repositories')) {
-        f.style.display = 'none'; return;
-      }
-    }
-    // 2. Find the nearest shared ancestor of all repo links and hide it
-    const links = [...document.querySelectorAll('a[data-hovercard-type="repository"]')];
-    if (!links.length) return;
-    let ancestor = links[0].parentElement;
-    while (ancestor && ancestor.tagName !== 'BODY') {
-      if (ancestor.querySelectorAll('a[data-hovercard-type="repository"]').length === links.length) {
-        // Walk one more level up to include the "Top repositories" heading
-        const parent = ancestor.parentElement;
-        if (parent && parent.tagName !== 'BODY') ancestor = parent;
-        break;
-      }
-      ancestor = ancestor.parentElement;
-    }
-    if (ancestor && ancestor.tagName !== 'BODY') ancestor.style.display = 'none';
-  }
-
   function findShowMoreBtn() {
     for (const el of document.querySelectorAll('a, button')) {
       if (el.closest('#gso-root')) continue;
@@ -201,7 +178,8 @@
       if (finished) return;
       finished = true;
       doImport();
-      hideNativeRepoSection();
+      const sidebar = findGHSidebar();
+      if (sidebar) hideNativeRepos(sidebar);
     }
 
     function tick() {
