@@ -134,8 +134,14 @@
     }
   }
 
+  function findTopReposScope() {
+    const frame = [...document.querySelectorAll('turbo-frame[src]')]
+      .find(f => f.src.includes('top_repositories') || f.src.includes('my_top_repositories'));
+    return frame || findGHSidebar() || document;
+  }
+
   function doImport() {
-    const links = document.querySelectorAll('a[data-hovercard-type="repository"]');
+    const links = findTopReposScope().querySelectorAll('a[data-hovercard-type="repository"]');
     if (!links.length) return false;
 
     const known = new Set(folders.flatMap(f => f.repos.map(r => r.id)));
@@ -158,7 +164,8 @@
   }
 
   function findShowMoreBtn() {
-    for (const el of document.querySelectorAll('a, button')) {
+    const scope = findTopReposScope();
+    for (const el of scope.querySelectorAll('a, button')) {
       if (el.closest('#gso-root')) continue;
       if (!el.offsetParent) continue;
       if (/^show\s+more$/i.test(el.textContent.trim())) return el;
