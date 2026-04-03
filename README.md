@@ -6,9 +6,9 @@ Extension Chrome/Firefox qui remplace la liste native de repos GitHub par une si
 
 - Import automatique de tous les repos depuis la sidebar GitHub au chargement
 - Organisation en dossiers, réordonnement par drag & drop
-- Création de dossier en glissant un repo sur un autre (style Discord)
-- Renommage inline des dossiers (double-clic)
-- Thème adaptatif dark/light mode
+- Ajout de repos non personnels
+- Création de dossier
+- Thème adaptatif
 - Sauvegarde locale automatique
 - Export/import JSON
 
@@ -28,20 +28,6 @@ Extension Chrome/Firefox qui remplace la liste native de repos GitHub par une si
 
 Après modification, recharger l'extension depuis `about:debugging` (Firefox) ou `chrome://extensions` (Chrome).
 
-Console du content script : clic droit sur github.com > Inspecter > Console.
-
-## Packaging
-
-```bash
-# Firefox
-cp manifest.firefox.json manifest.json
-zip -r extension-firefox.zip . --exclude "*.git*" --exclude "node_modules/*"
-
-# Chrome
-cp manifest.chrome.json manifest.json
-zip -r extension-chrome.zip . --exclude "*.git*" --exclude "node_modules/*"
-```
-
 ## Stockage
 
-Les données sont sauvegardées dans `chrome.storage.local` sous la clé `folders` — tableau de dossiers contenant chacun une liste de repos `{ id, name, url, addedAt }`.
+Les données sont sauvegardées dans `chrome.storage.local` sous la clé `folders`. Tableau de dossiers contenant chacun une liste de repos `{ id, name, url, addedAt }`.
