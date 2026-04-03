@@ -1,4 +1,4 @@
-# GitHub Sidebar Organizer
+# GitHub Sidebar: Repo Organizer
 
 Extension Chrome/Firefox qui remplace la liste native de repos GitHub par une sidebar organisable en dossiers avec drag & drop.
 
